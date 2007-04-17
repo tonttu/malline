@@ -1,19 +1,52 @@
 require 'malline/view_proxy.rb'
 require 'malline/view_wrapper.rb'
+require 'malline/view_xhtml.rb'
 
 module Malline
 	class Base
+		@@options = { :strict => false, :xhtml => false }
 		def initialize(view)
 			@view = view
 			@view.extend ViewWrapper
+
+			@view.instance_eval do
+				class << self; self; end.send(:define_method, :method_missing, method(:tag!))
+			end unless @@options[:strict]
+
+			definetags *Malline::XHTML_TAGS if @@options[:xhtml]
+		end
+
+		def self.setopt hash
+			if block_given?
+				o = @@options.dup
+				@@options.merge!(hash)
+				yield
+				@@options = o
+			else
+				@@options.merge!(hash)
+			end
 		end
 
 		def render(tpl, local_assigns = {}, n = nil)
+			run(local_assigns) { eval tpl }
+		end
+
+		def self.run local_assigns = {}, &block
+			self.new(Class.new).run(local_assigns, &block)
+		end
+
+		def run local_assigns = {}, &block
 			add_local_assigns local_assigns
-			@view.instance_eval do
-				@__dom = []
-				eval tpl
-				__render
+			@view.__run &block
+		end
+
+		def definetags *tags
+			tags.each do |tag|
+				eval %{
+					def @view.#{tag}(*args, &block)
+						tag!('#{tag}', *args, &block)
+					end
+				}
 			end
 		end
 

@@ -12,7 +12,7 @@ module Malline
 			@__dom << value
 		end
 
-		def method_missing(s, *args, &block)
+		def tag! s, *args, &block
 			if s.to_s[0].chr == '_' && respond_to?(s.to_s[1..255].to_sym)
 				tmp = send(s.to_s[1..255].to_sym, *args, &block)
 				@__dom << tmp.to_s
@@ -53,5 +53,10 @@ module Malline
 			out
 		end
 
+		def __run &block
+			@__dom = []
+			instance_eval &block
+			__render
+		end
 	end
 end
