@@ -101,4 +101,13 @@ class MallineTest < Test::Unit::TestCase
 			assert(error =~ /undefined local variable or method/)
 		end
 	end
+
+	def test_file
+		Base.setopt :strict => true, :xhtml => true do
+			tpl = Base.new(View.new)
+			html = File.read(File.join(File.dirname(__FILE__), 'kernel.org.html'))
+			mn = tpl.render(File.read(File.join(File.dirname(__FILE__), 'kernel.org.mn')))
+			assert_equal(html, mn)
+		end
+	end
 end

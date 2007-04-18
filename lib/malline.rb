@@ -20,8 +20,11 @@ module Malline
 			if block_given?
 				o = @@options.dup
 				@@options.merge!(hash)
-				yield
-				@@options = o
+				begin
+					yield
+				ensure
+					@@options = o
+				end
 			else
 				@@options.merge!(hash)
 			end
