@@ -1,5 +1,15 @@
 module Malline
+	class ErbOut
+		def initialize view
+			@view = view
+		end
+		def concat value
+			@view << value
+		end
+	end
 	module ViewWrapper
+
+		attr_accessor :_erbout
 
 		def __yld dom
 			tmp = @__dom

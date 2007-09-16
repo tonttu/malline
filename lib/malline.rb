@@ -10,6 +10,7 @@ module Malline
 			@view.extend ViewWrapper
 
 			@view.instance_eval do
+				@_erbout = ErbOut.new(self)
 				class << self; self; end.send(:define_method, :method_missing, method(:tag!))
 			end unless @@options[:strict]
 
