@@ -58,7 +58,7 @@ module Malline
 		def add_local_assigns l
 			@view.instance_eval do
 				l.each { |key, value| instance_variable_set "@#{key}", value }
-				evaluate_assigns if respond_to?(:evaluate_assigns)
+				evaluate_assigns if respond_to?(:evaluate_assigns, true)
 				class << self; self; end.send(:attr_accessor, *(l.keys))
 			end
 		end
