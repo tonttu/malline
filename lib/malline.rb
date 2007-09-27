@@ -11,7 +11,7 @@ module Malline
 			@options = @@options.dup
 			@options.merge! opts.pop if opts.last.is_a?(Hash)
 
-			@view = opts.pop || Class.new
+			@view = opts.shift || Class.new
 			@view.extend ViewWrapper
 			@view.init_wrapper @options
 

@@ -8,6 +8,7 @@ module Malline
 		end
 	end
 	module ViewWrapper
+		alias_method :super_method_missing, :method_missing unless method_defined?(:super_method_missing)
 
 		attr_accessor :_erbout
 		attr_accessor :options
@@ -17,9 +18,8 @@ module Malline
 			@options = opts
 			@short_tag_excludes = []
 			@_erbout = ErbOut.new(self)
-			unless @options[:strict]
-				class << self; self; end.send(:define_method, :method_missing, method(:tag!))
-			end
+			class << self; self; end.send(:define_method, :method_missing,
+																		method(@options[:strict] ? :helper! : :tag!))
 		end
 
 		# These two are stolen from Erb
@@ -43,6 +43,17 @@ module Malline
 
 		def << value
 			@__dom << value
+		end
+
+		def helper! s, *args, &block
+			helper = (s.to_s[0].chr == '_') ? s.to_s[1..255].to_sym : s.to_sym
+			if respond_to?(helper)
+				tmp = send(helper, *args, &block)
+				@__dom << tmp.to_s
+				tmp
+			else
+				super_method_missing(helper, *args)
+			end
 		end
 
 		def tag! s, *args, &block
