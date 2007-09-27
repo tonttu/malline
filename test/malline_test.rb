@@ -12,24 +12,26 @@ end
 class MallineTest < Test::Unit::TestCase
 	include Malline
 	include MallineTestHelpers
-
+	
 	def test_simple
-		assert_xml_equal('<foo id="a"><bar class="a b"/></foo>',
-			Base.run do
-				foo.a! do
-					bar.a.b
+		Base.setopt :strict => false, :xhtml => false do
+			assert_xml_equal('<foo id="a"><bar class="a b"/></foo>',
+				Base.run do
+					foo.a! do
+						bar.a.b
+					end
 				end
-			end
-		)
-
+			)
+		end
 	end
 
-  def test_basics
+	def test_basics
 		images = [Image.new(1, '/image/img1', 'Image 1'), Image.new(2, '/2', 'Image 2')]
 
 		out = Base.new(View.new).run :images => images do
 			html do
 				body do
+					div.header!
 					div.imagelist.images! "There are some images:" do
 						@images.each do |im|
 							a(:href => img_path(im)) { img :src => im.url }
@@ -41,26 +43,30 @@ class MallineTest < Test::Unit::TestCase
 				end
 			end
 		end
-		assert_xml_equal('<html><body><div class="imagelist" id="images">There are some images:<a href="/images/1"><img src="/image/img1"/></a><span class="caption imagetext">Image 1</span><a href="/images/2"><img src="/2"/></a><span class="caption imagetext">Image 2</span>No more images</div><div id="footer"><span>footer</span></div></body></html>', out)
+		assert_xml_equal('<html><body><div id="header"></div><div class="imagelist" id="images">There are some images:<a href="/images/1"><img src="/image/img1"/></a><span class="caption imagetext">Image 1</span><a href="/images/2"><img src="/2"/></a><span class="caption imagetext">Image 2</span>No more images</div><div id="footer"><span>footer</span></div></body></html>', out)
 	end
 
 	def test_tag!
-		out = Base.run do
-			foo do
-				tag!('foobar', :foobar => 'foobar') do
-					tag!('foobar2', :foobar => 'foobar2') do
-						bar do
-							foo
+		Base.setopt :strict => false, :xhtml => false do
+			out = Base.run do
+				foo do
+					tag!('foobar', :foobar => 'foobar') do
+						tag!('foobar2', :foobar => 'foobar2') do
+							bar do
+								foo
+							end
 						end
 					end
 				end
 			end
+			assert_xml_equal('<foo><foobar foobar="foobar"><foobar2 foobar="foobar2"><bar><foo/></bar></foobar2></foobar></foo>', out)
 		end
-		assert_xml_equal('<foo><foobar foobar="foobar"><foobar2 foobar="foobar2"><bar><foo/></bar></foobar2></foobar></foo>', out)
 	end
 
 	def test_defined_tags
-		tpl = Base.new(View.new)
+		tpl = Base.setopt :strict => false, :xhtml => false do
+			Base.new(View.new)
+		end
 		b = Proc.new do
 			foo do
 				xxx :a => 'b' do
@@ -75,7 +81,9 @@ class MallineTest < Test::Unit::TestCase
 		out = tpl.run &b
 		assert_xml_equal('<foo><xxx a="b"><bar/></xxx></foo>', out)
 
-		out = Base.run &b
+		out = Base.setopt :strict => false, :xhtml => false do
+			Base.run &b
+		end
 		assert_xml_equal('<foo/>', out)
 	end
 
@@ -88,7 +96,7 @@ class MallineTest < Test::Unit::TestCase
 				end
 			end
 
-			assert_xml_equal('<html><body/></html>', out)
+			assert_xml_equal('<html><body></body></html>', out)
 
 			error = ''
 			begin

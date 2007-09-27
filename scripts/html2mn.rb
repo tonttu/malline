@@ -3,13 +3,20 @@
 require "rexml/document"
 include REXML
 
+def html_unescape str
+	str.to_s.gsub('&amp;', '&').gsub('&quot;', '"').gsub('&gt;', '>').gsub('&lt;', '<')
+end
+
 def esc str
-	# todo
-	str.split("'").join("\\'")
+	if str =~ /["#]/ || !(str =~ /'/)
+		"'"+(str.split("'").join("\\'"))+"'"
+	else
+		"\"#{str}\""
+	end
 end
 
 def attributes element
-	element.attributes.keys.collect {|k| "'#{esc k}' => '#{esc element.attributes[k]}'" }.join(', ')
+	element.attributes.keys.collect {|k| "#{esc k} => #{esc html_unescape(element.attributes[k])}" }.join(', ')
 end
 
 def txtize txt
@@ -18,17 +25,32 @@ def txtize txt
 end
 
 def convert element, prefix=''
+	valid_method = /^[A-Za-z][\w_]*$/
 	output = ''
 	if element.is_a?(Array)
 		element.each {|e| output << convert(e) }
 	elsif element.is_a?(Element)
 		output << prefix << element.name
+		attrs = []
+		element.attributes['class'].to_s.split.uniq.each do |cl|
+			if valid_method =~ cl
+				output << ".#{cl}"
+			else
+				attrs << cl
+			end
+		end
+		element.attributes.delete('class')
+		element.attributes['class'] = attrs.join(' ') unless attrs.empty?
+		if element.attributes['id'].to_s =~ valid_method
+			output << ".#{element.attributes['id']}!"
+			element.attributes.delete('id')
+		end
 		txt = ''
 		children = element.children
 		unless children.empty?
 			if children.first.is_a?(Text)
 				txt = txtize children.shift.to_s
-				output << " '#{esc txt}'" unless txt.empty?
+				output << " #{esc html_unescape(txt)}" unless txt.empty?
 			end
 		end
 
@@ -41,7 +63,7 @@ def convert element, prefix=''
 		output << "\n"
 	elsif element.is_a?(Text)
 		txt = txtize(element.to_s)
-		output << prefix << "txt! '#{esc txt}'\n" unless txt.empty?
+		output << prefix << "txt! #{esc html_unescape(txt)}\n" unless txt.empty?
 	end
 	output
 end

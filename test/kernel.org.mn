@@ -13,10 +13,10 @@ html 'xmlns' => 'http://www.w3.org/1999/xhtml' do
 			end
 			txt! 'The Linux Kernel Archives'
 		end
-		p 'Welcome to the Linux Kernel Archives. This is the primary site
+		p.headtext 'Welcome to the Linux Kernel Archives. This is the primary site
 for the Linux kernel source, but it has much more than just
-Linux kernels.', 'class' => 'headtext'
-		div 'id' => 'directory' do
+Linux kernels.'
+		div.directory! do
 			table 'style' => 'margin-top:10px' do
 				tr do
 					th 'Protocol'
@@ -46,8 +46,8 @@ Linux kernels.', 'class' => 'headtext'
 				end
 			end
 		end
-		div 'id' => 'versions' do
-			table 'class' => 'kver' do
+		div.versions! do
+			table.kver do
 				tr 'align' => 'left' do
 					td 'The latest stable version of the Linux kernel is:&nbsp;'
 					td do
@@ -240,7 +240,7 @@ Linux kernels.', 'class' => 'headtext'
 					end
 				end
 			end
-			p 'class' => 'pvkey' do
+			p.pvkey do
 				b 'F'
 				txt! '= full source,'
 				b 'B'
@@ -253,13 +253,13 @@ Linux kernels.', 'class' => 'headtext'
 				txt! '= current'
 				a 'changesets', 'href' => 'changeset.html'
 				br
-				txt! 'Changelogs are provided by the kernel authors directly. Please
-don\'t write the webmaster about them.'
+				txt! "Changelogs are provided by the kernel authors directly. Please
+don't write the webmaster about them."
 				br
 				a 'Customize the patch viewer', 'href' => 'diff/config.html'
 			end
 		end
-		p 'class' => 'bandwidth' do
+		p.bandwidth do
 			a 'href' => 'http://zeus1.kernel.org/bw-zeus1.pdf' do
 				img 'src' => 'http://zeus1.kernel.org/bw-zeus1.png', 'height' => '128', 'alt' => 'zeus1 bwbar', 'style' => 'border:1px solid #bbd', 'width' => '240'
 			end
@@ -270,9 +270,9 @@ don\'t write the webmaster about them.'
 				img 'src' => 'http://git.kernel.org/bw-poseidon.png', 'alt' => 'git bwbar', 'style' => 'border:1px solid #bbd'
 			end
 		end
-		h2 'Site News', 'id' => 'news'
+		h2.news! 'Site News'
 		ul do
-			li 'Apr 14, 2007:', 'class' => 'newsitem' do
+			li.newsitem 'Apr 14, 2007:' do
 				strong 'Downtime'
 				txt! 'Kernel.org has some
 forced downtime on April 14 due to the circuit breakers
@@ -293,7 +293,7 @@ during the extent of the outage.  If load is excessive, we may
 be forced to close this service for the duration of the outage
 in order to protect higher priority services.'
 			end
-			li 'Mar 13, 2007:', 'class' => 'newsitem' do
+			li.newsitem 'Mar 13, 2007:' do
 				strong '10 years of kernel.org!'
 				txt! 'The
 Linux Kernel archives were'
@@ -304,10 +304,10 @@ possible over the years, our sponsors, staff volunteers and of
 course the Linux community for making it a worthwhile effort
 in the first place!'
 			end
-			li 'Mar 10, 2007: zeus1 is back online and serving all classes of traffic.  This concludes the maintenance window that started earlier this week.  The hope is that these changes will lower the loads experienced by the machines.', 'class' => 'newsitem' do
+			li.newsitem 'Mar 10, 2007: zeus1 is back online and serving all classes of traffic.  This concludes the maintenance window that started earlier this week.  The hope is that these changes will lower the loads experienced by the machines.' do
 				p 'Thanks for bearing with us the last couple of days - we know things were slow but we beat our expected restore date by 3 days (syncing 2.4TB of data across the internet is something we had previously experienced taking a week).  Happy downloading.'
 			end
-			li 'Mar 1, 2007: We now have a', 'class' => 'newsitem' do
+			li.newsitem 'Mar 1, 2007: We now have a' do
 				a 'dedicated git server', 'href' => 'http://git.kernel.org/'
 				txt! '.  This is
 the same HP DL380G2 which used to be our sole main server
@@ -329,14 +329,14 @@ boot, and was serving the production git needs in less than 12 hours.'
 and to Hewlett Packard for building a machine that can take the beating
 of an unnamed shipping company and keep on ticking.'
 			end
-			li 'It has now been five years since the kernel.org servers moved to', 'class' => 'newsitem' do
+			li.newsitem 'It has now been five years since the kernel.org servers moved to' do
 				a 'ISC', 'href' => 'http://www.isc.org/'
-				txt! '.  Massive thanks to ISC
+				txt! ".  Massive thanks to ISC
 and all of its sponsors for all the bandwidth we have eaten up
-over the years!  We\'ll continue to keep your wires warm for as
-long as you\'ll let us!'
+over the years!  We'll continue to keep your wires warm for as
+long as you'll let us!"
 			end
-			li 'Feb 4, 2006:', 'class' => 'newsitem' do
+			li.newsitem 'Feb 4, 2006:' do
 				a 'Hewlett-Packard', 'href' => 'http://www.hp.com/'
 				txt! 'has been kind
 enough to replace our internal master server with a brand new'
@@ -344,13 +344,13 @@ enough to replace our internal master server with a brand new'
 				txt! 'with a dual-core Opteron&nbsp;275 and 4&nbsp;GB of RAM.  Once
 again, huge thanks to HP!'
 			end
-			li 'Sep 30, 2005:
-By popular demand, there is now a', 'class' => 'newsitem' do
+			li.newsitem 'Sep 30, 2005:
+By popular demand, there is now a' do
 				a 'kernel.org FAQ', 'href' => '/faq/'
 				txt! '.'
 			end
-			li 'Apr 9, 2005:
-We have put two new external servers, graciously donated by', 'class' => 'newsitem' do
+			li.newsitem 'Apr 9, 2005:
+We have put two new external servers, graciously donated by' do
 				a 'Hewlett-Packard', 'href' => 'http://www.hp.com/'
 				txt! 'into full production use.'
 				p 'These servers are both' do
@@ -362,8 +362,8 @@ We have put two new external servers, graciously donated by', 'class' => 'newsit
 					txt! 'gigabit link.  Enjoy!'
 				end
 			end
-			li 'Aug 21, 2003:
-Please don\'t use', 'class' => 'newsitem' do
+			li.newsitem "Aug 21, 2003:
+Please don't use" do
 				strong 'finger.kernel.org'
 				txt! 'for any
 sort of automatic monitoring. The number of automatic bots
@@ -373,7 +373,7 @@ more often than not. The same information is available from'
 				txt! '.'
 			end
 		end
-		h2 'The Linux Kernel Archives Mirror System', 'id' => 'mirrors'
+		h2.mirrors! 'The Linux Kernel Archives Mirror System'
 		p 'To improve access for everyone, a number of
 sites around the world have provided mirrors of this site, which
 may be faster to use than the master archive itself. Please see' do
@@ -393,7 +393,7 @@ see' do
 				a 'this link.', 'href' => 'signature.html#expire'
 			end
 		end
-		h2 'What is Linux?', 'id' => 'whatislinux'
+		h2.whatislinux! 'What is Linux?'
 		p 'Linux is a clone of the operating system Unix,
 written from scratch by Linus Torvalds with assistance from a
 loosely-knit team of hackers across the Net. It aims towards
@@ -455,10 +455,10 @@ although functionality is then obviously somewhat limited. See the'
 			txt! 'for more
 info.'
 		end
-		h2 'New to Linux?', 'id' => 'newtolinux'
-		p 'If you\'re new to Linux, you don\'t want to download the kernel,
+		h2.newtolinux! 'New to Linux?'
+		p "If you're new to Linux, you don't want to download the kernel,
 which is just a component in a working Linux system. Instead, you
-want what is called a' do
+want what is called a" do
 			em 'distribution'
 			txt! 'of Linux, which is a
 complete Linux system. There are numerous distributions available
@@ -486,12 +486,12 @@ Linux Installation HOWTO', 'href' => 'http://mirrors.kernel.org/LDP/HOWTO/Instal
 			txt! 'has more information how to set up
 your first Linux system.'
 		end
-		h2 'More Information', 'id' => 'moreinfo'
+		h2.moreinfo! 'More Information'
 		p 'There is much' do
 			a 'information about Linux on the web', 'href' => 'links.html'
 			txt! '.'
 		end
-		h2 'Reporting Linux Kernel bugs', 'id' => 'reportingbugs'
+		h2.reportingbugs! 'Reporting Linux Kernel bugs'
 		p 'Please see' do
 			a 'href' => '/pub/linux/docs/lkml/reporting-bugs.html' do
 				strong 'http://www.kernel.org/pub/linux/docs/lkml/reporting-bugs.html'
@@ -505,7 +505,7 @@ the kernel.org administrators will be ignored.'
 			txt! '.
 Currently this is for reporting kernel version 2.6 bugs only.'
 		end
-		h2 'Mailing list', 'id' => 'mailinglist'
+		h2.mailinglist! 'Mailing list'
 		p 'The Linux kernel is discussed on the' do
 			em 'linux-kernel'
 			txt! 'mailing list at'
@@ -542,7 +542,7 @@ archives of the list can be found at:'
 				end
 			end
 		end
-		h2 'Development trees', 'id' => 'git'
+		h2.git! 'Development trees'
 		p 'The Linux kernel, as well as several other pieces of software,
 are maintained using the' do
 			a 'git', 'href' => '/pub/software/scm/git'
@@ -558,7 +558,7 @@ git repositories on'
 			em 'kernel.org'
 			txt! '.'
 		end
-		h2 'Cryptographic Software', 'id' => 'crypto'
+		h2.crypto! 'Cryptographic Software'
 		p 'Due to U.S. Exports Regulations, all
 cryptographic software on this site is subject to the following
 legal notice:'
@@ -578,7 +578,7 @@ more information about current U.S. regulations.'
 		p 'Our servers are located in Corvallis, Oregon, Palo Alto and San
 Francisco, California, USA; use in violation of any applicable laws
 is prohibited.'
-		h2 'Comments', 'id' => 'contact'
+		h2.contact! 'Comments'
 		p 'Before emailing kernel.org, please take a look at our' do
 			a 'kernel.org FAQ', 'href' => '/faq/'
 			txt! '.'
@@ -623,7 +623,7 @@ support from the following sponsors.'
 			end
 		end
 		hr
-		p 'id' => 'sponsors' do
+		p.sponsors! do
 			a 'href' => 'http://www.isc.org/' do
 				img 'src' => 'logos/hostedatisc.png', 'height' => '41', 'alt' => 'Internet Systems Consortium', 'width' => '84'
 			end
@@ -645,7 +645,7 @@ support from the following sponsors.'
 			end
 			br 'clear' => 'left'
 		end
-		p 'Linux is a Registered Trademark of Linus Torvalds.', 'id' => 'trademark' do
+		p.trademark! 'Linux is a Registered Trademark of Linus Torvalds.' do
 			br
 			a '(Legal Notice)', 'href' => 'legal.html'
 		end

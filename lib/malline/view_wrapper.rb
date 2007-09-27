@@ -10,6 +10,25 @@ module Malline
 	module ViewWrapper
 
 		attr_accessor :_erbout
+		attr_accessor :options
+		attr_accessor :short_tag_excludes
+
+		def init_wrapper opts
+			@options = opts
+			@short_tag_excludes = []
+			@_erbout = ErbOut.new(self)
+			unless @options[:strict]
+				class << self; self; end.send(:define_method, :method_missing, method(:tag!))
+			end
+		end
+
+		# These two are stolen from Erb
+		def self.html_escape(s)
+			s.to_s.gsub(/&/, "&amp;").gsub(/\"/, "&quot;").gsub(/>/, "&gt;").gsub(/</, "&lt;")
+		end
+		def self.url_encode(s)
+			s.to_s.gsub(/[^a-zA-Z0-9_\-.]/n){ sprintf("%%%02X", $&.unpack("C")[0]) }
+		end
 
 		def __yld dom
 			tmp = @__dom
@@ -19,7 +38,7 @@ module Malline
 		end
 
 		def txt! value
-			@__dom << value
+			@__dom << ViewWrapper.html_escape(value)
 		end
 
 		def << value
@@ -33,12 +52,12 @@ module Malline
 				return tmp
 			end
 
-			tag = {:name => s, :attrs => {}, :children => []}
+			tag = {:name => s.to_s, :attrs => {}, :children => []}
 			if args.last.is_a?(Hash)
 				tag[:attrs].merge!(args.pop)
 			end
 			txt = args.flatten.join('')
-			tag[:children] << txt unless txt.empty?
+			tag[:children] << ViewWrapper.html_escape(txt) unless txt.empty?
 
 			@__dom << tag
 			__yld tag[:children], &block if block_given?
@@ -53,10 +72,14 @@ module Malline
 					out << tag
 				else
 					out << "<#{tag[:name]}"
-					attr_str = tag[:attrs].keys.collect{|key| "#{key}=\"#{tag[:attrs][key]}\"" }.join(" ")
+					attr_str = tag[:attrs].keys.collect{|key| "#{key}=\"#{ViewWrapper.html_escape(tag[:attrs][key])}\"" }.join(" ")
 					out << " #{attr_str}" unless attr_str.nil? || attr_str.empty?
 					if tag[:children].empty?
-						out << '/>'
+						if short_tag_excludes.include?(tag[:name])
+							out << "></#{tag[:name]}>"
+						else
+							out << '/>'
+						end
 					else
 						out << '>'
 						out << __render(tag[:children])
@@ -71,15 +94,6 @@ module Malline
 			@__dom = []
 			instance_eval &block
 			__render
-		end
-
-		# TOOD: include this from some module and use only if xhtml is used
-		# custom lang and encoding?
-		def xhtml *args, &block
-			attrs = {:xmlns => 'http://www.w3.org/1999/xhtml', 'xml:lang' => 'fi'}
-			attrs.merge!(args.pop) if args.last.is_a?(Hash)
-			txt! "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			tag! 'html', args.flatten.join(''), attrs, &block
 		end
 	end
 end

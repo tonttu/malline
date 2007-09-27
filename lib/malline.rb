@@ -4,31 +4,34 @@ require 'malline/view_xhtml.rb'
 
 module Malline
 	class Base
-		@@options = { :strict => false, :xhtml => false }
-		def initialize(view)
-			@view = view
+		@@options = { :strict => true, :xhtml => true, :encoding => 'UTF-8', :lang => 'en' }
+		attr_reader :view
+
+		def initialize(*opts)
+			@options = @@options.dup
+			@options.merge! opts.pop if opts.last.is_a?(Hash)
+
+			@view = opts.pop || Class.new
 			@view.extend ViewWrapper
+			@view.init_wrapper @options
 
-			@view.instance_eval do
-				@_erbout = ErbOut.new(self)
-				class << self; self; end.send(:define_method, :method_missing, method(:tag!))
-			end unless @@options[:strict]
-
-			definetags *Malline::XHTML_TAGS if @@options[:xhtml]
+			Malline::XHTML.load_plugin self if @options[:xhtml]
 		end
 
 		def self.setopt hash
+			output = nil
 			if block_given?
 				o = @@options.dup
-				@@options.merge!(hash)
+				@@options.merge!(hash) if hash
 				begin
-					yield
+					output = yield
 				ensure
 					@@options = o
 				end
 			else
 				@@options.merge!(hash)
 			end
+			output
 		end
 
 		def render(tpl, local_assigns = {}, n = nil)
@@ -36,7 +39,7 @@ module Malline
 		end
 
 		def self.run local_assigns = {}, &block
-			self.new(Class.new).run(local_assigns, &block)
+			self.new.run(local_assigns, &block)
 		end
 
 		def run local_assigns = {}, &block
