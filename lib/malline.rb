@@ -12,10 +12,11 @@ module Malline
 			@options.merge! opts.pop if opts.last.is_a?(Hash)
 
 			@view = opts.shift || Class.new
-			@view.extend ViewWrapper
-			@view.init_wrapper @options
-
-			Malline::XHTML.load_plugin self if @options[:xhtml]
+			unless @view.respond_to?(:__yld)
+				@view.extend ViewWrapper
+				@view.init_wrapper @options
+				Malline::XHTML.load_plugin self if @options[:xhtml]
+			end
 		end
 
 		def self.setopt hash

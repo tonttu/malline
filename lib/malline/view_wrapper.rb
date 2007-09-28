@@ -15,6 +15,7 @@ module Malline
 		attr_accessor :short_tag_excludes
 
 		def init_wrapper opts
+			@__stack = []
 			@options = opts
 			@short_tag_excludes = []
 			@_erbout = ErbOut.new(self)
@@ -102,9 +103,12 @@ module Malline
 		end
 
 		def __run &block
+			@__stack.push @__dom
 			@__dom = []
 			instance_eval &block
-			__render
+			out = __render
+			@__dom = @__stack.pop
+			out
 		end
 	end
 end
