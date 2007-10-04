@@ -16,6 +16,7 @@ module Malline
 
 		def init_wrapper opts
 			@__stack = []
+			@__whitespace = []
 			@options = opts
 			@short_tag_excludes = []
 			@_erbout = ErbOut.new(self)
@@ -48,11 +49,12 @@ module Malline
 		end
 
 		def txt! value
+			@__dom << ' ' unless @__whitespace.empty?
 			@__dom << ViewWrapper.html_escape(value)
 		end
 
 		def << value
-			@__dom << value
+			@__dom << value unless value.nil?
 		end
 
 		def helper! s, *args, &block
@@ -74,14 +76,22 @@ module Malline
 			end
 
 			tag = {:name => s.to_s, :attrs => {}, :children => []}
+			tag[:whitespace] = true unless @__whitespace.empty?
+			whitespace = false
 			if args.last.is_a?(Hash)
 				tag[:attrs].merge!(args.pop)
+			end
+			if args.include?(:whitespace)
+				args.delete(:whitespace)
+				@__whitespace.push(true)
+				whitespace = true
 			end
 			txt = args.flatten.join('')
 			tag[:children] << ViewWrapper.html_escape(txt) unless txt.empty?
 
 			@__dom << tag
 			__yld tag[:children], &block if block_given?
+			@__whitespace.pop if whitespace
 			ViewProxy.new self, tag
 		end
 
@@ -92,6 +102,7 @@ module Malline
 				if tag.is_a?(String)
 					out << tag
 				else
+					out << ' ' if tag[:whitespace]
 					out << "<#{tag[:name]}"
 					attr_str = tag[:attrs].keys.collect{|key| "#{key}=\"#{ViewWrapper.html_escape(tag[:attrs][key])}\"" }.join(" ")
 					out << " #{attr_str}" unless attr_str.nil? || attr_str.empty?
