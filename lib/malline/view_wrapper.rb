@@ -31,6 +31,15 @@ module Malline
 			s.to_s.gsub(/[^a-zA-Z0-9_\-.]/n){ sprintf("%%%02X", $&.unpack("C")[0]) }
 		end
 
+		def capture &block
+			tmp = @__dom
+			@__dom = []
+			yield
+			output = __render
+			@__dom = tmp
+			output
+		end
+
 		def __yld dom
 			tmp = @__dom
 			@__dom = dom

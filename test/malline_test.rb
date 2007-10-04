@@ -118,4 +118,20 @@ class MallineTest < Test::Unit::TestCase
 			assert_equal(html, mn)
 		end
 	end
+
+	def test_capture
+		Base.setopt :strict => false, :xhtml => false do
+			out = Base.run do
+				foo do
+					@captured = capture do
+						a { b 'Yo' }
+					end
+					x
+				end
+				bar { self << @captured }
+				txt! 'EOF'
+			end
+			assert_xml_equal('<foo><x/></foo><bar><a><b>Yo</b></a></bar>EOF', out)
+		end
+	end
 end
