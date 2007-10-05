@@ -16,7 +16,7 @@ module Malline
 
 		def init_wrapper opts
 			@__stack = []
-			@__whitespace = []
+			@__whitespace = false
 			@options = opts
 			@short_tag_excludes = []
 			@_erbout = ErbOut.new(self)
@@ -49,12 +49,13 @@ module Malline
 		end
 
 		def _ *values
-			@__dom << ' ' unless @__whitespace.empty?
+			@__dom << ' ' if @__whitespace
 			@__dom << ViewWrapper.html_escape(values.join(' '))
 		end
 		alias_method :txt!, :_
 
 		def << value
+			@__dom << ' ' if @__whitespace
 			@__dom << value unless value.nil?
 		end
 
@@ -63,6 +64,7 @@ module Malline
 			helper = (s.to_s[0].chr == '_') ? s.to_s[1..255].to_sym : s.to_sym
 			if respond_to?(helper)
 				tmp = send(helper, *args, &block)
+				@__dom << ' ' if @__whitespace
 				@__dom << tmp.to_s
 				tmp
 			else
@@ -73,27 +75,24 @@ module Malline
 		def tag! s, *args, &block
 			if s.to_s[0].chr == '_' && respond_to?(s.to_s[1..255].to_sym)
 				tmp = send(s.to_s[1..255].to_sym, *args, &block)
+				@__dom << ' ' if @__whitespace
 				@__dom << tmp.to_s
 				return tmp
 			end
 
 			tag = {:name => s.to_s, :attrs => {}, :children => []}
-			tag[:whitespace] = true unless @__whitespace.empty?
-			whitespace = false
+			tag[:whitespace] = true if @__whitespace
+			whitespace = @__whitespace
 			if args.last.is_a?(Hash)
 				tag[:attrs].merge!(args.pop)
 			end
-			if args.include?(:whitespace)
-				args.delete(:whitespace)
-				@__whitespace.push(true)
-				whitespace = true
-			end
+			@__whitespace = true if args.delete(:whitespace)
 			txt = args.flatten.join('')
 			tag[:children] << ViewWrapper.html_escape(txt) unless txt.empty?
 
 			@__dom << tag
 			__yld tag[:children], &block if block_given?
-			@__whitespace.pop if whitespace
+			@__whitespace = whitespace
 			ViewProxy.new self, tag
 		end
 
