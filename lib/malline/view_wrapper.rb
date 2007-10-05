@@ -48,16 +48,18 @@ module Malline
 			@__dom = tmp
 		end
 
-		def txt! value
+		def _ *values
 			@__dom << ' ' unless @__whitespace.empty?
-			@__dom << ViewWrapper.html_escape(value)
+			@__dom << ViewWrapper.html_escape(values.join(' '))
 		end
+		alias_method :txt!, :_
 
 		def << value
 			@__dom << value unless value.nil?
 		end
 
 		def helper! s, *args, &block
+			return tag!(s, *args, &block) unless @options[:strict]
 			helper = (s.to_s[0].chr == '_') ? s.to_s[1..255].to_sym : s.to_sym
 			if respond_to?(helper)
 				tmp = send(helper, *args, &block)
