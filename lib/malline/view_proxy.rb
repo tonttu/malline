@@ -6,6 +6,10 @@ module Malline
 			@tag = tag
 		end
 
+		def __yld &block
+			@wrapper.__yld @tag[:children], &block
+		end
+
 		def txt! value
 			@tag[:children] << value
 		end
