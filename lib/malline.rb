@@ -1,6 +1,7 @@
 require 'malline/view_proxy.rb'
 require 'malline/view_wrapper.rb'
 require 'malline/view_xhtml.rb'
+require 'malline/rails.rb'
 
 module Malline
 	class Base
@@ -22,6 +23,10 @@ module Malline
 			end
 		end
 
+		def set_path path
+			@view.__path = path
+		end
+
 		def self.setopt hash
 			output = nil
 			if block_given?
@@ -38,8 +43,10 @@ module Malline
 			output
 		end
 
+		# n is there to keep things compatible with Markaby
 		def render(tpl, local_assigns = {}, n = nil)
-			run(local_assigns) { eval tpl }
+			add_local_assigns local_assigns
+			@view.__run tpl
 		end
 
 		def self.run local_assigns = {}, &block

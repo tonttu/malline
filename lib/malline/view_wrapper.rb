@@ -28,10 +28,12 @@ module Malline
 		attr_accessor :options
 		attr_accessor :short_tag_excludes
 		attr_accessor :__whitespace
+		attr_accessor :__path
 
 		def init_wrapper opts
 			@__stack = []
 			@__whitespace = false
+			@__path = 'Malline template'
 			@options = opts
 			@short_tag_excludes = []
 			@_erbout = ErbOut.new(self)
@@ -138,10 +140,14 @@ module Malline
 			out
 		end
 
-		def __run &block
+		def __run(tpl = nil, &block)
 			@__stack.push @__dom
 			@__dom = []
-			instance_eval &block
+			if block_given?
+				instance_eval &block
+			else
+				instance_eval tpl, @__path
+			end
 			out = __render
 			@__dom = @__stack.pop
 			out
