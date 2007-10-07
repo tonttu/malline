@@ -1,3 +1,20 @@
+# Copyright © 2007 Riku Palomäki
+#
+# This file is part of Malline.
+#
+# Malline is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Malline is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with Malline.  If not, see <http://www.gnu.org/licenses/>.
+
 module Malline
 	class ErbOut
 		def initialize view
@@ -41,7 +58,8 @@ module Malline
 																		method(@options[:strict] ? :helper! : :tag!))
 		end
 
-		# These two are stolen from Erb
+		# These two are stolen from ERB
+		# © 1999-2000,2002,2003 Masatoshi SEKI
 		def self.html_escape(s)
 			s.to_s.gsub(/&/, "&amp;").gsub(/\"/, "&quot;").gsub(/>/, "&gt;").gsub(/</, "&lt;")
 		end
