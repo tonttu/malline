@@ -7,12 +7,27 @@ module Malline
 			@view << value
 		end
 	end
+	class FormBuilder
+		def initialize *args
+			@view = eval('self', args.last)
+			@view = nil unless @view.is_a?(ViewWrapper)
+			@builder = ::ActionView::Helpers::FormBuilder.new(*args)
+		end
+		def method_missing *args, &block
+			if @view
+				@view << @builder.send(*args, &block)
+			else
+				@builder.send(*args, &block)
+			end
+		end
+	end
 	module ViewWrapper
 		alias_method :super_method_missing, :method_missing unless method_defined?(:super_method_missing)
 
 		attr_accessor :_erbout
 		attr_accessor :options
 		attr_accessor :short_tag_excludes
+		attr_accessor :__whitespace
 
 		def init_wrapper opts
 			@__stack = []
@@ -56,7 +71,7 @@ module Malline
 
 		def << value
 			@__dom << ' ' if @__whitespace
-			@__dom << value unless value.nil?
+			@__dom << value.to_s unless value.nil?
 		end
 
 		def helper! s, *args, &block

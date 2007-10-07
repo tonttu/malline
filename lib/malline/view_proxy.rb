@@ -27,10 +27,13 @@ module Malline
 				@tag[:attrs]['class'].strip!
 			end
 
+			whitespace = @wrapper.__whitespace
+			@wrapper.__whitespace = true if args.delete(:whitespace)
 			txt = args.flatten.join('')
 			@tag[:children] << txt unless txt.empty?
 
 			@wrapper.__yld @tag[:children], &block if block_given?
+			@wrapper.__whitespace = whitespace
 			self
 		end
 

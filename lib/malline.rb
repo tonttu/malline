@@ -4,7 +4,7 @@ require 'malline/view_xhtml.rb'
 
 module Malline
 	class Base
-		@@options = { :strict => true, :xhtml => true, :encoding => 'UTF-8', :lang => 'en' }
+		@@options = { :strict => true, :xhtml => true, :encoding => 'UTF-8', :lang => 'en', :form_for_proxy => true }
 		attr_reader :view
 
 		def initialize(*opts)
@@ -12,10 +12,13 @@ module Malline
 			@options.merge! opts.pop if opts.last.is_a?(Hash)
 
 			@view = opts.shift || Class.new
-			unless @view.respond_to?(:__yld)
+			unless @view.is_a?(ViewWrapper)
 				@view.extend ViewWrapper
 				@view.init_wrapper @options
 				Malline::XHTML.load_plugin self if @options[:xhtml]
+			end
+			if @options[:form_for_proxy]
+				ActionView::Base.default_form_builder = ::Malline::FormBuilder
 			end
 		end
 
