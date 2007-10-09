@@ -35,8 +35,11 @@ module Malline
 				@view.init_wrapper @options
 				Malline::XHTML.load_plugin self if @options[:xhtml]
 			end
-			if @options[:form_for_proxy] and Module.const_defined?('ActionView') and ActionView.const_defined?('Base')
-				ActionView::Base.default_form_builder = ::Malline::FormBuilder
+			if @options[:form_for_proxy]
+				begin
+					ActionView::Base.default_form_builder = ::Malline::FormBuilder
+				rescue NameError
+				end
 			end
 		end
 
