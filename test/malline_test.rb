@@ -14,7 +14,9 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
-
+t = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+$: << t
+$: << File.join(t, 'lib')
 require 'test/unit'
 require 'test/malline_test_helpers.rb'
 require 'malline.rb'

@@ -24,11 +24,11 @@ module Malline::XHTML
 
 	module Tags
 	 	def xhtml *args, &block
-			attrs = { :xmlns => 'http://www.w3.org/1999/xhtml', 'xml:lang' => @options[:lang] }
+			attrs = { :xmlns => 'http://www.w3.org/1999/xhtml', 'xml:lang' => @mn_options[:lang] }
 			attrs.merge!(args.pop) if args.last.is_a?(Hash)
-			self << "<?xml version=\"1.0\" encoding=\"#{@options[:encoding] || 'UTF-8'}\"?>\n"
-			self << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 #{@options[:xhtml_dtd] || 'Transitional'}//EN\"\n"
-			self << "  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-#{(@options[:xhtml_dtd] || 'Transitional').downcase}.dtd\">\n"
+			self << "<?xml version=\"1.0\" encoding=\"#{@mn_options[:encoding] || 'UTF-8'}\"?>\n"
+			self << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 #{@mn_options[:xhtml_dtd] || 'Transitional'}//EN\"\n"
+			self << "  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-#{(@mn_options[:xhtml_dtd] || 'Transitional').downcase}.dtd\">\n"
 			tag! 'html', args.flatten.join(''), attrs, &block
 		end
 
@@ -47,7 +47,7 @@ module Malline::XHTML
 			proxy = tag! 'head', *args, &block
 			proxy.__yld { title } unless @__xhtml_title
 			proxy.__yld do
-				meta :content => "text/html; charset=#{@options[:encoding] || 'UTF-8'}", 'http-equiv' => 'Content-Type'
+				meta :content => "text/html; charset=#{@mn_options[:encoding] || 'UTF-8'}", 'http-equiv' => 'Content-Type'
 			end unless @__xhtml_meta
 		end
 	end

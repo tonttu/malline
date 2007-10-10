@@ -39,10 +39,8 @@ module Malline
 		end
 	end
 	module ViewWrapper
-		alias_method :super_method_missing, :method_missing unless method_defined?(:super_method_missing)
-
 		attr_accessor :_erbout
-		attr_accessor :options
+		attr_accessor :mn_options
 		attr_accessor :short_tag_excludes
 		attr_accessor :__whitespace
 		attr_accessor :__path
@@ -51,11 +49,9 @@ module Malline
 			@__stack = []
 			@__whitespace = false
 			@__path = 'Malline template'
-			@options = opts
+			@mn_options = opts
 			@short_tag_excludes = []
 			@_erbout = ErbOut.new(self)
-			class << self; self; end.send(:define_method, :method_missing,
-																		method(@options[:strict] ? :helper! : :tag!))
 		end
 
 		# These two are stolen from ERB
@@ -105,8 +101,7 @@ module Malline
 			@__dom << value.to_s unless value.nil?
 		end
 
-		def helper! s, *args, &block
-			return tag!(s, *args, &block) unless @options[:strict]
+		def method_missing s, *args, &block
 			helper = (s.to_s[0].chr == '_') ? s.to_s[1..255].to_sym : s.to_sym
 			if respond_to?(helper)
 				tmp = send(helper, *args, &block)
@@ -114,18 +109,12 @@ module Malline
 				@__dom << tmp.to_s
 				tmp
 			else
-				super_method_missing(helper, *args)
+				return super if @mn_options[:strict]
+				tag! s, *args, &block
 			end
 		end
 
 		def tag! s, *args, &block
-			if s.to_s[0].chr == '_' && respond_to?(s.to_s[1..255].to_sym)
-				tmp = send(s.to_s[1..255].to_sym, *args, &block)
-				@__dom << ' ' if @__whitespace
-				@__dom << tmp.to_s
-				return tmp
-			end
-
 			tag = {:name => s.to_s, :attrs => {}, :children => []}
 			tag[:whitespace] = true if @__whitespace
 			whitespace = @__whitespace
