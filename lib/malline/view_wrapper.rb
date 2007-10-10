@@ -67,6 +67,17 @@ module Malline
 			s.to_s.gsub(/[^a-zA-Z0-9_\-.]/n){ sprintf("%%%02X", $&.unpack("C")[0]) }
 		end
 
+		def cache(name = {}, options = {}, &block)
+			return block.call unless @controller.perform_caching
+			cache = @controller.read_fragment(name, options)
+
+			unless cache
+				cache = capture { block.call }
+				@controller.write_fragment(name, cache, options)
+			end
+			self << cache
+		end
+
 		def capture &block
 			tmp = @__dom
 			@__dom = []
