@@ -74,10 +74,10 @@ module Malline
 		end
 
 		# n is there to keep things compatible with Markaby
-		def render(tpl, local_assigns = {}, n = nil)
+		def render tpl = nil, local_assigns = {}, n = nil, &block
 			add_local_assigns local_assigns
 			@malline_render = true
-			tmp = @view.malline.run tpl
+			tmp = @view.malline.run tpl, &block
 			@malline_render = nil
 			tmp
 		end
@@ -86,13 +86,8 @@ module Malline
 			!@malline_render.nil?
 		end
 
-		def self.run local_assigns = {}, &block
-			self.new.run(local_assigns, &block)
-		end
-
-		def run local_assigns = {}, &block
-			add_local_assigns local_assigns
-			@view.malline.run &block
+		def self.render tpl = nil, local_assigns = {}, &block
+			self.new.render(tpl, local_assigns, &block)
 		end
 
 		def definetags *tags

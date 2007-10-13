@@ -21,9 +21,30 @@ require 'test/unit'
 require 'test/malline_test_helpers.rb'
 require 'malline.rb'
 
+class Controller
+	def perform_caching
+		false
+	end
+end
+
+class Comment
+end
+
 class View
-	def img_path(im)
-		"/images/#{im.id}"
+	def initialize
+		@controller = Controller.new
+	end
+	def image_path(im)
+		"/images/#{im.is_a?(MallineTestHelpers::Image) ? im.id : 'img'}"
+	end
+	def truncate(str, size = 10)
+		str[0...size]
+	end
+	def render hash
+		Malline::Base.new(View.new).render File.read(File.join(File.dirname(__FILE__), hash[:partial].sub(/\//, '/_') + '.mn')) rescue ''
+	end
+	def link_to *args
+		'link'
 	end
 end
 
@@ -31,11 +52,11 @@ end
 class MallineTest < Test::Unit::TestCase
 	include Malline
 	include MallineTestHelpers
-	
+
 	def test_simple
 		Base.setopt :strict => false, :xhtml => false do
 			assert_xml_equal('<foo id="a"><bar class="a b"/></foo>',
-				Base.run do
+				Base.render do
 					foo.a! do
 						bar.a.b
 					end
@@ -47,13 +68,13 @@ class MallineTest < Test::Unit::TestCase
 	def test_basics
 		images = [Image.new(1, '/image/img1', 'Image 1'), Image.new(2, '/2', 'Image 2')]
 
-		out = Base.new(View.new).run :images => images do
+		out = Base.new(View.new).render nil, :images => images do
 			html do
 				body do
 					div.header!
 					div.imagelist.images! "There are some images:" do
 						@images.each do |im|
-							a(:href => img_path(im)) { img :src => im.url }
+							a(:href => image_path(im)) { img :src => im.url }
 							span.caption.imagetext im.caption
 						end
 						txt! "No more images"
@@ -67,7 +88,7 @@ class MallineTest < Test::Unit::TestCase
 
 	def test_tag!
 		Base.setopt :strict => false, :xhtml => false do
-			out = Base.run do
+			out = Base.render do
 				foo do
 					tag!('foobar', :foobar => 'foobar') do
 						tag!('foobar2', :foobar => 'foobar2') do
@@ -93,22 +114,22 @@ class MallineTest < Test::Unit::TestCase
 				end
 			end
 		end
-		out = tpl.run &b
+		out = tpl.render nil, &b
 		assert_xml_equal('<foo/>', out)
 
 		tpl.definetags :xxx
-		out = tpl.run &b
+		out = tpl.render nil, &b
 		assert_xml_equal('<foo><xxx a="b"><bar/></xxx></foo>', out)
 
 		out = Base.setopt :strict => false, :xhtml => false do
-			Base.run &b
+			Base.render &b
 		end
 		assert_xml_equal('<foo/>', out)
 	end
 
 	def test_xhtml
 		Base.setopt :strict => true, :xhtml => true do
-			out = Base.run do
+			out = Base.render do
 				html do
 					body do
 					end
@@ -119,7 +140,7 @@ class MallineTest < Test::Unit::TestCase
 
 			error = ''
 			begin
-				Base.run do
+				Base.render do
 					foo
 				end
 			rescue => e
@@ -140,7 +161,7 @@ class MallineTest < Test::Unit::TestCase
 
 	def test_capture
 		Base.setopt :strict => false, :xhtml => false do
-			out = Base.run do
+			out = Base.render do
 				foo do
 					@captured = capture do
 						a { b 'Yo' }
@@ -151,6 +172,13 @@ class MallineTest < Test::Unit::TestCase
 				txt! 'EOF'
 			end
 			assert_xml_equal('<foo><x/></foo><bar><a><b>Yo</b></a></bar>EOF', out)
+		end
+	end
+
+	def test_examples
+		Dir.glob(File.join(File.dirname(__FILE__), 'examples', '*.mn')).each do |file|
+			assert_equal(File.read(file.sub(/\.mn$/, '.target')),
+				Base.new(View.new).render(File.read(file))+"\n", file)
 		end
 	end
 end
