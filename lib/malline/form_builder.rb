@@ -16,39 +16,18 @@
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
 
 module Malline
-	class ViewProxy
-		def initialize template, tag
-			@tpl = template
-			@tag = tag
+	class FormBuilder
+		def initialize *args
+			@view = eval('self', args.last)
+			@view = nil unless @view.respond_to?(:is_malline?) && @view.is_malline?
+			@builder = ::ActionView::Helpers::FormBuilder.new(*args)
 		end
-
-		def __yld &block
-			@tpl.execute @tag[:children], &block
-		end
-
-		def method_missing(s, *args, &block)
-			if args.last.is_a?(Hash)
-				@tag[:attrs].merge!(args.pop)
-			end
-
-			if /\!$/ =~ s.to_s
-				@tag[:attrs]['id'] = s.to_s.chomp('!')
+		def method_missing *args, &block
+			if @view
+				@view << @builder.send(*args, &block)
 			else
-				if @tag[:attrs]['class']
-					@tag[:attrs]['class'] << " #{s}"
-				else
-					@tag[:attrs]['class'] = s.to_s
-				end
+				@builder.send(*args, &block)
 			end
-
-			whitespace = @tpl.whitespace
-			@tpl.whitespace = true if args.delete(:whitespace)
-			txt = args.flatten.join('')
-			@tag[:children] << txt unless txt.empty?
-
-			@tpl.execute @tag[:children], &block if block_given?
-			@tpl.whitespace = whitespace
-			self
 		end
 	end
 end

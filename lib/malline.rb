@@ -19,12 +19,19 @@ require 'malline/view_proxy.rb'
 require 'malline/view_wrapper.rb'
 require 'malline/view_xhtml.rb'
 require 'malline/rails.rb'
+require 'malline/erb_out.rb'
+require 'malline/form_builder.rb'
+require 'malline/template.rb'
 
 module Malline
+	# Template-handler class that is registered to ActionView and initialized by it.
 	class Base
+		# Default options for new instances, can be changed with setopt
 		@@options = { :strict => true, :xhtml => true, :encoding => 'UTF-8', :lang => 'en', :form_for_proxy => true }
 		attr_reader :view
 
+		# First parameter is the view object (if any)
+		# Last parameter is optional options hash
 		def initialize(*opts)
 			@options = @@options.dup
 			@options.merge! opts.pop if opts.last.is_a?(Hash)
@@ -32,9 +39,12 @@ module Malline
 			@view = opts.shift || Class.new
 			unless @view.is_a?(ViewWrapper)
 				@view.extend ViewWrapper
-				@view.init_wrapper @options
+				@view.malline @options
 				Malline::XHTML.load_plugin self if @options[:xhtml]
+			else
+				@view.malline @options
 			end
+
 			if @options[:form_for_proxy]
 				begin
 					ActionView::Base.default_form_builder = ::Malline::FormBuilder
@@ -44,7 +54,7 @@ module Malline
 		end
 
 		def set_path path
-			@view.__path = path
+			@view.malline.path = path
 		end
 
 		def self.setopt hash
@@ -66,7 +76,14 @@ module Malline
 		# n is there to keep things compatible with Markaby
 		def render(tpl, local_assigns = {}, n = nil)
 			add_local_assigns local_assigns
-			@view.__run tpl
+			@malline_render = true
+			tmp = @view.malline.run tpl
+			@malline_render = nil
+			tmp
+		end
+
+		def is_malline?
+			!@malline_render.nil?
 		end
 
 		def self.run local_assigns = {}, &block
@@ -75,7 +92,7 @@ module Malline
 
 		def run local_assigns = {}, &block
 			add_local_assigns local_assigns
-			@view.__run &block
+			@view.malline.run &block
 		end
 
 		def definetags *tags
