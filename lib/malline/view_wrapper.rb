@@ -68,5 +68,9 @@ module Malline
 		def tag! *args, &block
 			@malline.tag *args, &block
 		end
+
+		def is_malline?
+			@malline_is_active
+		end
 	end
 end

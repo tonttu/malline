@@ -76,14 +76,8 @@ module Malline
 		# n is there to keep things compatible with Markaby
 		def render tpl = nil, local_assigns = {}, n = nil, &block
 			add_local_assigns local_assigns
-			@malline_render = true
 			tmp = @view.malline.run tpl, &block
-			@malline_render = nil
 			tmp
-		end
-
-		def is_malline?
-			!@malline_render.nil?
 		end
 
 		def self.render tpl = nil, local_assigns = {}, &block

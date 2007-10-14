@@ -26,10 +26,12 @@ module ActionView
 		alias_method :orig_delegate_render, :delegate_render
 		def delegate_render(handler, template, local_assigns)
 			if handler == Malline::Base
+				@malline_is_active = true
 				h = handler.new(self)
 				h.set_path(@current_tpl_path)
 				h.render(template, local_assigns)
 			else
+				@malline_is_active = false
 				orig_delegate_render(handler, template, local_assigns)
 			end
 		end
