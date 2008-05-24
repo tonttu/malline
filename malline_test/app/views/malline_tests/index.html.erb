@@ -1,0 +1,22 @@
+<h1>Listing malline_tests</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+
+<% for malline_test in @malline_tests %>
+  <tr>
+    <td><%=h malline_test.name %></td>
+    <td><%=h malline_test.description %></td>
+    <td><%= link_to 'Show', malline_test %></td>
+    <td><%= link_to 'Edit', edit_malline_test_path(malline_test) %></td>
+    <td><%= link_to 'Destroy', malline_test, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New malline_test', new_malline_test_path %>

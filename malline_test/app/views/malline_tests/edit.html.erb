@@ -1,0 +1,22 @@
+<h1>Editing malline_test</h1>
+
+<%= error_messages_for :malline_test %>
+
+<% form_for(@malline_test) do |f| %>
+  <p>
+    <b>Name</b><br />
+    <%= f.text_field :name %>
+  </p>
+
+  <p>
+    <b>Description</b><br />
+    <%= f.text_area :description %>
+  </p>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @malline_test %> |
+<%= link_to 'Back', malline_tests_path %>
