@@ -1,0 +1,23 @@
+h1 'Editing malline_test'
+
+_error_messages_for :malline_test
+
+form_for(@malline_test) do |f|
+	p do
+		b 'Name'; br
+		f.text_field :name
+	end
+
+	p do
+		b 'Description'; br
+		f.text_area :description
+	end
+
+	p do
+		f.submit "Update"
+	end
+end
+
+_link_to 'Show', @malline_test
+_' | '
+_link_to 'Back', malline_tests_path

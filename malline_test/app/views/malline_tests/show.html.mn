@@ -1,0 +1,13 @@
+p do
+	b 'Name: '
+	_ @malline_test.name
+end
+
+p do
+	b 'Description: '
+	_ @malline_test.description
+end
+
+_link_to 'Edit', edit_malline_test_path(@malline_test)
+_' | '
+_link_to 'Back', malline_tests_path

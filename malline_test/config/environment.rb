@@ -57,3 +57,9 @@ Rails::Initializer.run do |config|
   # Make Active Record use UTC-base instead of local time
   # config.active_record.default_timezone = :utc
 end
+
+# Let's force Malline the first choice for template engine. This way we can
+# keep all the .erb files as a reference with renaming/moving them out the way
+ActionView::Base.module_eval do
+	template_handler_extensions.unshift template_handler_extensions.delete('mn')
+end

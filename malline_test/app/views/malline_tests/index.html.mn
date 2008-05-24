@@ -1,0 +1,22 @@
+h1 'Listing malline_tests'
+
+table do
+	tr do
+		th 'Name'
+		th 'Description'
+	end
+
+	for malline_test in @malline_tests
+		tr do
+			td malline_test.name
+			td malline_test.description
+			td { _link_to 'Show', malline_test }
+			td { _link_to 'Edit', edit_malline_test_path(malline_test) }
+			td { _link_to 'Destroy', malline_test, :confirm => 'Are you sure?', :method => :delete }
+		end
+	end
+end
+
+br
+
+_link_to 'New malline_test', new_malline_test_path
