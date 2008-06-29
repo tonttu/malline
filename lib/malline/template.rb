@@ -22,7 +22,9 @@ module Malline
 		attr_accessor :whitespace
 		attr_accessor :path
 		attr_accessor :helper_overrides
-
+		attr_accessor :tags
+		attr_reader :rendered
+		attr_accessor :plugins
 		def initialize view, opts
 			@view = view
 			@whitespace = false
@@ -30,6 +32,14 @@ module Malline
 			@options = opts
 			@short_tag_excludes = []
 			@helper_overrides = {}
+			@tags = {}
+			@plugins = []
+			@inited = false
+		end
+
+		def init
+			return if @inited
+			XHTML.install @view if @options[:xhtml]
 		end
 
 		# These two are stolen from ERB
@@ -123,16 +133,14 @@ module Malline
 
 		# Execute and render a text or block
 		def run tpl = nil, &block
+			init
 			tmp = []
-			if defined?(ActionView) && Rails::VERSION::STRING > "2.0.z"
-				execute tmp, tpl.source, &block
-			else
-				execute tmp, tpl, &block
-			end
-			render tmp
+			old, @view.malline_is_active = @view.malline_is_active, true
+			execute tmp, tpl, &block
+			@view.malline_is_active = old
+			@rendered = render tmp
 		end
 
-		# TODO: These should also be able to disable
 		def definetags! *tags
 			tags.flatten.each do |tag|
 				tag = tag.to_sym
@@ -142,7 +150,7 @@ module Malline
 		end
 
 		def definetags *tags
-			tags.flatten.each{|tag| define_tag!(tag) unless @view.respond_to?(tag)}
+			tags.flatten.each{|tag| @tags[tag] = true }
 		end
 
 		def define_tag! tag

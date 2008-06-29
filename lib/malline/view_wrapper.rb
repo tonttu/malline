@@ -35,7 +35,7 @@ module Malline
 			if @malline
 				@malline.options.merge!(opts) if opts.is_a?(Hash)
 			else
-				@malline = Template.new(self, opts)
+				@malline = Template.new(self, opts || {})
 			end
 			init_malline_methods unless @malline_methods_inited
 			@malline
@@ -71,12 +71,16 @@ module Malline
 
 		def method_missing s, *args, &block
 			return super unless is_malline?
-			helper = ((s.to_s[0] == ?_) ? s.to_s[1..-1] : s).to_sym
-			if respond_to?(helper)
-				@malline.helper(helper, *args, &block)
+			if @malline.tags[s]
+				@malline.tag s, *args, &block
 			else
-				return super if @malline.options[:strict]
-				_malline_tag! s, *args, &block
+				helper = ((s.to_s[0] == ?_) ? s.to_s[1..-1] : s).to_sym
+				if respond_to?(helper)
+					@malline.helper(helper, *args, &block)
+				else
+					return super if @malline.options[:strict]
+					_malline_tag! s, *args, &block
+				end
 			end
 		end
 
