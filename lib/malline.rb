@@ -59,11 +59,11 @@ module Malline
 
 		def self.setopt hash
 			return @@options.merge!(hash) unless block_given?
-			o = @@options.dup
+			old = @@options.dup
 			@@options.merge! hash if hash
 			yield
 		ensure
-			@@options = o if old
+			@@options = old if old
 		end
 
 		def render tpl = nil, local_assigns = {}, &block
