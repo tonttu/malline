@@ -17,10 +17,10 @@
 
 module Malline
 	class FormBuilder
-		def initialize *args
+		def initialize *args, &block
 			@view = eval('self', args.last)
 			@view = nil unless @view.respond_to?(:is_malline?) && @view.is_malline?
-			@builder = ::ActionView::Helpers::FormBuilder.new(*args)
+			@builder = ::ActionView::Helpers::FormBuilder.new(*args, &block)
 		end
 		def method_missing *args, &block
 			if @view
