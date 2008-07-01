@@ -23,4 +23,24 @@ if Rails::VERSION::STRING <= "2.0.z"
 else
 	require 'malline/adapters/rails-2.1'
 end
+
+# Activate our FormBuilder wrapper, so we can use forms more easily
 ActionView::Base.default_form_builder = Malline::FormBuilder
+
+module Malline::ViewWrapper
+	@@malline_methods << 'cache'
+
+	# Rails caching
+	def _malline_cache name = {}, options = {}, &block
+		return block.call unless @controller.perform_caching
+		cache = @controller.read_fragment(name, options)
+
+		unless cache
+			cache = _malline_capture { block.call }
+			@controller.write_fragment(name, cache, options)
+		end
+		@malline.add_unescaped_text cache
+	end
+end
+
+

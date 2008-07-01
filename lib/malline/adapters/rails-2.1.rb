@@ -16,8 +16,12 @@
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# We need to redefine some ActionView::Template methods, Since Rails 2.1 doesn't
+# offer any better way to do some things.
 class ActionView::Template
 	alias_method :orig_render, :render
+	# Tell Malline to be deactivated if there is a non-Malline partial inside
+	# Malline template.
 	def render *args, &block
 		old, @view.malline_is_active = @view.malline_is_active, false
 		ret = orig_render *args, &block
@@ -27,15 +31,23 @@ class ActionView::Template
 end
 
 module Malline
+	# Malline template handler for Rails 2.1
+	#
+	# We use Compilable-interface, even though Malline templates really doesn't
+	# compile into anything, but at least template files won't always be re-read
+	# from files. Builder templates (.builder|.rxml) also use this interface.
 	class RailsHandler < ActionView::TemplateHandler
 		include ActionView::TemplateHandlers::Compilable
 
+		# We have three lines framework code before real template code in
+		# 'compiled code'
 		def self.line_offset
 			3
 		end
 
+		# Compiles the template, i.e. return a runnable ruby code that initializes
+		# a new Malline::Base objects and renders the template.
 		def compile template
-			puts "Compiling #{template.path}"
 			path = template.path.gsub('\\', '\\\\\\').gsub("'", "\\\\'")
 			"__malline_handler = Malline::Base.new self
 			malline.path = '#{path}'
@@ -44,8 +56,8 @@ module Malline
 			end"
 		end
 
+		# Get the rendered fragment contents
 		def cache_fragment block, name = {}, options = nil
-			puts "Cache_fragment"
 			@view.fragment_for(block, name, options) do
 				eval("__malline_handler.rendered", block.binding)
 			end

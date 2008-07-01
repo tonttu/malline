@@ -26,6 +26,9 @@ module Malline
 	# Always form ^\d+\.\d+\.\d+(-[^\s]*)?$
 	VERSION = '1.1.0-svn'
 
+	# Malline handler, always use Malline engine with this
+	# 	handler = Malline.new @view, :strict => false
+	# 	handler.
 	class Base
 		attr_accessor :malline
 
@@ -49,6 +52,7 @@ module Malline
 			@malline = @view.malline @options
 		end
 
+		# Get the current filename
 		def path 
 			@view.malline.path
 		end
@@ -57,6 +61,15 @@ module Malline
 			@view.malline.path = npath
 		end
 
+		# for example:
+		# 	setopt :strict => false
+		#
+		# or:
+		# 	setopt :strict => false
+		#		something
+		# 	setopt :strict => true do
+		#   	something strict
+		# 	end
 		def self.setopt hash
 			return @@options.merge!(hash) unless block_given?
 			old = @@options.dup
@@ -84,6 +97,8 @@ module Malline
 		end
 
 		private
+		# Define hash as instance variables, for example { :foo => 'bar' }
+		# will work as @foo == 'bar' and foo == 'bar'
 		def add_local_assigns l
 			@view.instance_eval do
 				l.each { |key, value| instance_variable_set "@#{key}", value }

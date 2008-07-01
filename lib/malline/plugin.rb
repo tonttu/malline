@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
 
+# Malline very incomplete Plugin interface.
 class Malline::Plugin
 	# Install a new plugin: Malline::WhatEverPlugin.install view
 	def self.install view

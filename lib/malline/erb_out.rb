@@ -16,11 +16,16 @@
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
 
 module Malline
-	# ERB emulator
+	# Since some parts of Rails use ERB directly instead of current template
+	# handler, we have to capture all that data.
+	#
+	# In practice the erb buffer object (named ActiveView::Base.erb_variable)
+	# is a string, where data is simply concatted.
 	class ErbOut
 		def initialize view
 			@view = view
 		end
+		# Redirect all data to view
 		def concat value
 			@view << value
 		end

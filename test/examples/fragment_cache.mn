@@ -1,3 +1,4 @@
+require 'malline/rails'
 div do
 	cache "stuff" do
 		# This block is evaluated only if no cache with keyword stuff is found

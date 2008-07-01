@@ -16,15 +16,27 @@
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
 
 module Malline
+	# This is the class that really evaluates the template and is accessible
+	# from the view by "malline", for example:
+	# 	malline.path = 'File name'
 	class Template
+		# Current options (like @@options in Base)
 		attr_accessor :options
+		# List of every tag that doesn't support self-closing syntax
 		attr_accessor :short_tag_excludes
+		# Current state of :whitespace-modifier (bool)
 		attr_accessor :whitespace
+		# Current file name
 		attr_accessor :path
+		# Every overriden (in definetags!) helper method (:name => method)
 		attr_accessor :helper_overrides
+		# Every available tag, excluding the specific methods (:name => bool)
 		attr_accessor :tags
+		# Render result of the last #render
 		attr_reader :rendered
+		# List all installed plugins
 		attr_accessor :plugins
+
 		def initialize view, opts
 			@view = view
 			@whitespace = false
@@ -37,16 +49,19 @@ module Malline
 			@inited = false
 		end
 
+		# Install plugins and do every thing that cannot be done in initialize
+		# Plugin install will use @view.malline, that will create a duplicate
+		# Template instance, if it's called from initialize.
 		def init
 			return if @inited
 			XHTML.install @view if @options[:xhtml]
 		end
 
-		# These two are stolen from ERB
-		# © 1999-2000,2002,2003 Masatoshi SEKI
+		# Stolen from ERB, © 1999-2000,2002,2003 Masatoshi SEKI
 		def self.html_escape(s)
 			s.to_s.gsub(/&/, "&amp;").gsub(/\"/, "&quot;").gsub(/>/, "&gt;").gsub(/</, "&lt;")
 		end
+		# Stolen from ERB, © 1999-2000,2002,2003 Masatoshi SEKI
 		def self.url_encode(s)
 			s.to_s.gsub(/[^a-zA-Z0-9_\-.]/n){ sprintf("%%%02X", $&.unpack("C")[0]) }
 		end
@@ -63,28 +78,33 @@ module Malline
 			@dom = tmp
 		end
 
+		# Add escaped string to @dom
 		def add_text *values
 			@dom << ' ' if @whitespace
 			@dom << Template.html_escape(values.join(' '))
 		end
 
+		# Add unescaped string to @dom
 		def add_unescaped_text value
 			@dom << ' ' if @whitespace
 			@dom << value.to_s unless value.nil?
 		end
 
+		# Call a helper (a method defined outside malline whose
+		# output is stored to @dom)
 		def helper helper, *args, &block
 			helper = helper.to_sym
 			tmp = if h = @helper_overrides[helper]
-				h.call(*args, &block)
+				h.call *args, &block
 			else
-				@view.send(helper, *args, &block)
+				@view.send helper, *args, &block
 			end
 			@dom << ' ' if @whitespace
 			@dom << tmp.to_s
 			tmp
 		end
 
+		# Add a tag to @dom
 		def tag s, *args, &block
 			tag = { :name => s.to_s, :attrs => {}, :children => [] }
 
@@ -106,15 +126,15 @@ module Malline
 			ViewProxy.new self, tag
 		end
 
-		# Render the xml tree at dom or root
+		# Render the XML tree at dom or @dom
 		def render dom = nil
-			(dom || @dom).inject('') do |out, tag|
+			@rendered = (dom || @dom).inject('') do |out, tag|
 				if tag.is_a?(String)
 					out << tag
 				else
 					out << ' ' if tag[:whitespace]
 					out << "<#{tag[:name]}"
-					out << tag[:attrs].inject(''){|s, a| s += " #{a.first}=\"#{Template.html_escape(a.last)}\""}
+					out << tag[:attrs].inject(''){|s, a| s + " #{a.first}=\"#{Template.html_escape(a.last)}\""}
 
 					if tag[:children].empty?
 						if @short_tag_excludes.include?(tag[:name])
@@ -138,9 +158,10 @@ module Malline
 			old, @view.malline_is_active = @view.malline_is_active, true
 			execute tmp, tpl, &block
 			@view.malline_is_active = old
-			@rendered = render tmp
+			render tmp
 		end
 
+		# Define tags as a methods, overriding all same named methods
 		def definetags! *tags
 			tags.flatten.each do |tag|
 				tag = tag.to_sym
@@ -149,10 +170,12 @@ module Malline
 			end
 		end
 
+		# Marking tags as usable, but not overriding anything
 		def definetags *tags
 			tags.flatten.each{|tag| @tags[tag] = true }
 		end
 
+		# Define a method tag
 		def define_tag! tag
 			eval %{
 				def @view.#{tag}(*args, &block)

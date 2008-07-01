@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Malline.  If not, see <http://www.gnu.org/licenses/>.
 
+# Quite stupid plugin for XHTML, we should be able to do this only with a DTD
+# or similar.
+#
+# Defines all usable tags, list which one can be self-close, defines a short
+# cut tag *xhtml*. Also makes sure that there is some necessary elements in
+# the document.
 class Malline::XHTML < Malline::Plugin
 	CUSTOM_TAGS = %w{head title meta}
 

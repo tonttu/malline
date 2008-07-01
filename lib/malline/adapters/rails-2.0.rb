@@ -17,14 +17,21 @@
 
 ActionView::Base.register_template_handler 'mn', Malline::Base
 module ActionView
+	# We need to redefine some ActionView::Base methods, Since Rails 2.0 doesn't
+	# offer any better way to do some things.
 	class Base
 		alias_method :orig_render_template, :render_template
+		# We want to save the name of the current file to @current_tpl_path,
+		# because then the error backtrace from Rails will include the
+		# name of the file. I didn't find better way to get this
 		def render_template template_extension, template, file_path = nil, *rest
 			@current_tpl_path = file_path
 			orig_render_template(template_extension, template, file_path, *rest)
 		end
 
 		alias_method :orig_delegate_render, :delegate_render
+		# Update the current file to malline and tell Malline to be deactivated
+		# if there is a non-Malline partial inside Malline template.
 		def delegate_render(handler, template, local_assigns)
 			old = @malline_is_active
 			tmp = if handler == Malline::Base
