@@ -23,6 +23,7 @@ class ActionView::Template
 	# Tell Malline to be deactivated if there is a non-Malline partial inside
 	# Malline template.
 	def render *args, &block
+		return orig_render *args, &block unless @view.respond_to? :malline_is_active
 		old, @view.malline_is_active = @view.malline_is_active, false
 		ret = orig_render *args, &block
 		@view.malline_is_active = old
