@@ -44,26 +44,9 @@ module Malline
 		#
 		# Intended for internal use only
 		def __yld *args, &block
-			method_missing '', *args, &block
-		end
-
-		# Capture attribute definitions, special modifiers and blocks
-		def method_missing s, *args, &block
 			# div :title => 'data'
 			if args.last.is_a?(Hash)
 				@tag[:attrs].merge!(args.pop)
-			end
-
-			# div.id!
-			if /^(.*)!$/ =~ s.to_s
-				@tag[:attrs]['id'] = $1
-			else
-				# div.class
-				if @tag[:attrs]['class']
-					@tag[:attrs]['class'] << " #{s}"
-				else
-					@tag[:attrs]['class'] = s.to_s
-				end
 			end
 
 			# Modifiers
@@ -82,6 +65,23 @@ module Malline
 
 			# Chain the calls, for example: div.foo.bar!.yeah.boring
 			self
+		end
+
+		# Capture attribute definitions, special modifiers and blocks
+		def method_missing s, *args, &block
+			# div.id!
+			if /^(.*)!$/ =~ s.to_s
+				@tag[:attrs]['id'] = $1
+			elsif s
+				# div.class
+				if @tag[:attrs]['class']
+					@tag[:attrs]['class'] << " #{s}"
+				else
+					@tag[:attrs]['class'] = s.to_s
+				end
+			end
+
+			__yld *args, &block
 		end
 	end
 end
