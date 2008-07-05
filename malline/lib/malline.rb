@@ -24,7 +24,7 @@ require 'malline/plugins/xhtml.rb'
 
 module Malline
 	# Always form ^\d+\.\d+\.\d+(-[^\s]*)?$
-	VERSION = '1.1.0-svn'
+	VERSION = '1.1.0'
 
 	# Malline handler, always use Malline engine with this
 	# 	handler = Malline.new @view, :strict => false
