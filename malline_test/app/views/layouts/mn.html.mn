@@ -1,0 +1,10 @@
+xhtml do
+	head do
+		title 'Test (Malline layout)'
+	end
+	body do
+		self << @content_for_layout
+		hr
+		self << @content_for_foo
+	end
+end

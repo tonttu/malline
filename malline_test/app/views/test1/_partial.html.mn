@@ -1,0 +1,16 @@
+div.y! :whitespace do
+	_'<img src=""/>'
+	self << '<img src=""/>'
+	stuff 3
+	_stuff 4
+	@link = capture { _link_to 'Frontpage', '/' }
+end
+content_for :foo do
+	h1 'Foo'
+end
+label :for => 'test_foo'
+f.text_field 'name'
+for p2 in %w{sub esub}
+	_render :partial => p2, :locals => { :f => f, :lnk => @link }
+end
+hr

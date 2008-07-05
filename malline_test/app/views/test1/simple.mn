@@ -1,0 +1,8 @@
+div do
+	h1 ActionView::Template.handler_class_for_extension(current_render_extension)
+	h1 is_malline?
+	puts "Before"
+	_render :partial => 'simple_partial'
+	puts "After"
+	h1 ActionView::Template.handler_class_for_extension(current_render_extension)
+end

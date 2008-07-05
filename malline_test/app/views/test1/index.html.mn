@@ -1,0 +1,16 @@
+for p in %w{partial epartial}
+	form_for :malline_test, MallineTest.new do |f|
+		cache p do
+			_render :partial => p, :locals => { :f => f }
+		end
+		tmp = capture do
+			input.submit :type => :submit, :value => 'Send'
+		end
+		div.foo.bar!.zoo :whitespace do
+			_'Captured:'
+			self << tmp
+			stuff 1
+			_stuff 2
+		end
+	end
+end

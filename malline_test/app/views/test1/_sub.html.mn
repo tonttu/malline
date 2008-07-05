@@ -1,0 +1,22 @@
+malline :strict => false
+f.text_area :description, :cols => 60, :rows => 4
+self << @link
+_'Loppu'
+zorro { batman }
+
+malline :strict => true
+begin
+	zorro2 { batman2 }
+rescue NameError => n
+	span.error '1'
+end
+	
+malline :strict => false
+zorro3 { batman3 }
+
+malline :strict => true
+begin
+	zorro4 { batman4 }
+rescue NameError => n
+	span.error '2'
+end

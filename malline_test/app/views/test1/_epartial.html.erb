@@ -1,0 +1,17 @@
+<div id="y">
+	&lt;img src=""/&gt;
+	<img src=""/>
+	<% stuff 3 %>
+	<%= stuff 4 %>
+	<% @link = capture { %> <%= link_to 'Frontpage', '/' %> <% } %>
+</div>
+
+<% content_for :foo do %>
+	<h1>Foo</h1>
+<% end %>
+
+<label for="test_foo"><%= f.text_field 'name' %>
+<% for p2 in %w{sub esub} %>
+	<%= render :partial => p2, :locals => { :f => f, :lnk => @link } %>
+<% end %>
+<hr/>

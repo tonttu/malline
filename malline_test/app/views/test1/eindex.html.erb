@@ -1,0 +1,16 @@
+<% for p in %w{partial epartial} %>
+	<% form_for :malline_test, MallineTest.new do |f| %>
+		<% cache p do %>
+			<%= render :partial => p, :locals => { :f => f } %>
+		<% end %>
+		<% tmp = capture do %>
+			<input class="submit" type="submit" value="Send"/>
+		<% end %>
+		<div class="foo zoo" id="bar">
+			Captured:
+			<%= tmp %>
+			<% stuff 1 %>
+			<%= stuff 2 %>
+		</div>
+	<% end %>
+<% end %>
