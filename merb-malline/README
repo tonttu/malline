@@ -1,4 +1,6 @@
 merb-malline
 ============
 
-A plugin for the Merb framework that provides ...
+A plugin for the Merb framework that provides support for Malline templates.
+
+See http://www.malline.org/merb
